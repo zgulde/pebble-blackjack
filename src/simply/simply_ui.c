@@ -206,7 +206,9 @@ static void layer_update_callback(Layer *layer, GContext *ctx) {
         title_frame.origin.y += title_icon_bounds.size.h;
       });
     }
+#if defined(PBL_PLATFORM_CHALK)
     enable_text_flow_and_paging(self, title_attributes, &title_frame);
+#endif
     title_size = graphics_text_layout_get_content_size_with_attributes(
         title->text, title_font, title_frame, GTextOverflowModeWordWrap, text_align,
         title_attributes);
@@ -227,7 +229,9 @@ static void layer_update_callback(Layer *layer, GContext *ctx) {
         subtitle_frame.origin.y += subtitle_icon_bounds.size.h;
       });
     }
-    enable_text_flow_and_paging(self, title_attributes, &subtitle_frame);
+#if defined(PBL_PLATFORM_CHALK)
+    enable_text_flow_and_paging(self, subtitle_attributes, &subtitle_frame);
+#endif
     subtitle_size = graphics_text_layout_get_content_size_with_attributes(
         subtitle->text, title_font, subtitle_frame, GTextOverflowModeWordWrap, text_align,
         subtitle_attributes);
@@ -252,7 +256,9 @@ static void layer_update_callback(Layer *layer, GContext *ctx) {
       image_pos = body_rect.origin;
       body_rect.origin.y += body_image_bounds.size.h;
     }
+#if defined(PBL_PLATFORM_CHALK)
     enable_text_flow_and_paging(self, body_attributes, &body_rect);
+#endif
     GSize body_size = graphics_text_layout_get_content_size_with_attributes(
         body->text, body_font, body_rect, GTextOverflowModeWordWrap, text_align, body_attributes);
     if (self->window.is_scrollable) {
