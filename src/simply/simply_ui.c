@@ -233,7 +233,7 @@ static void layer_update_callback(Layer *layer, GContext *ctx) {
     enable_text_flow_and_paging(self, subtitle_attributes, &subtitle_frame);
 #endif
     subtitle_size = graphics_text_layout_get_content_size_with_attributes(
-        subtitle->text, title_font, subtitle_frame, GTextOverflowModeWordWrap, text_align,
+        subtitle->text, subtitle_font, subtitle_frame, GTextOverflowModeWordWrap, text_align,
         subtitle_attributes);
     subtitle_size.w = subtitle_frame.size.w;
     subtitle_pos = subtitle_frame.origin;
