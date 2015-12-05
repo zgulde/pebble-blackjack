@@ -1075,6 +1075,7 @@ Vibe.vibrate('long');
 ### Light
 
 `Light` allows you to control the Pebble's backlight.
+
 ````js
 var Light = require('ui/light');
 
