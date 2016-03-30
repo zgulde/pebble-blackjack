@@ -6,9 +6,9 @@ var baseURL = 'http://zgulde.me/cardsapi/decks';
 // makes a request to the base url with additional url parameters and data
 // returns the response parsed as JSON
 function request (options) {
-    urlAddition = (typeof options.url    !== 'undefined') ? options.url : '';
-    data        = (typeof options.data   !== 'undefined') ? options.data : {};
-    method      = (typeof options.method !== 'undefined') ? options.method : 'GET';
+    data        = (typeof options.data   !== 'undefined') ? options.data:   {};
+    method      = (typeof options.method !== 'undefined') ? options.method: 'GET';
+    urlAddition = (typeof options.url    !== 'undefined') ? options.url:    '';
 
     return JSON.parse(ajax({
         url: baseURL + urlAddition,
@@ -21,10 +21,21 @@ function request (options) {
 
 function draw (count) {
     count = (typeof count !== 'undefined') ? count : 1;
-    return request({data: {count: count}}).cards;
+    return request({url: '/draw', data: {count: count}}).cards;
 }
 
+function showHand (hand, hidden) {
+    hidden = (typeof hidden !== 'undefined') ? hidden : false;
 
+    var handString = '';
+    var firstCard  = hand.shift();
+
+    handString += (hidden) ? '[???] ' : '[' + firstCard.string + '] ';
+
+    return handString + hand.map(function(card){
+        return '[' + card.string + ']';
+    }).join(' ');
+}
 
 // grab the id of the newly created deck
 var deckid = request({method: 'post', data: {shuffle: true}}).id;
@@ -35,10 +46,8 @@ var dealerHand = draw(2);
 var playerHand = draw(2);
 
 var main = new UI.Card({
-  subtitle: dealerHand.map(function(card){ return card.string; }),
-  body: 'Press any button.',
-  subtitleColor: 'indigo', // Named colors
-  bodyColor: '#9a0036' // Hex colors
+    body: 'Dealer: ' + showHand(dealerHand, true) + '\n' + 
+          'Player: ' + showHand(playerHand)
 });
 
 main.show();
