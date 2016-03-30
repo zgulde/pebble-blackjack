@@ -48,7 +48,7 @@ change!
 I've created an alias for building installing and looking at the logs as that
 is a lot to type out. Here's the command you probably want to alias:
 
-    `pebble build && pebble install --emulator aplite && pebble logs'
+    pebble build && pebble install --emulator aplite && pebble logs
     
 This will build the project, install it on an emulator and stream the app's
 logs to your terminal.
