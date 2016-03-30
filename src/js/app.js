@@ -2,8 +2,10 @@ var UI = require('ui');
 var Vector2 = require('vector2');
 var ajax = require('ajax');
 var baseURL = 'http://zgulde.me/cardsapi/decks';
+// keep track of all the windows we make
 var windowStack = [];
 
+// show a card and push it onto the windowStack
 function show (uiCard) {
     windowStack.push(uiCard);
     uiCard.show();
@@ -65,5 +67,31 @@ var main = new UI.Card({
 show(main);
 
 main.on('click', 'select', function(e){
-    exit();
+    var menu = new UI.Menu({
+        sections: [{
+            items: [{
+                title: 'Hit'
+            }, {
+                title: 'Stay'
+            }, {
+                title: 'Exit'
+            }]
+        }]
+    });
+
+    menu.on('select', function(e){
+        console.log(e.item.title);
+        switch(e.item.title){
+            case 'Hit':
+                onHit();
+                break;
+            case 'Stay':
+                onStay();
+                break;
+            case 'Exit':
+                exit();
+        }
+    });
+
+    show(menu);
 });
