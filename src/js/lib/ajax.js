@@ -119,6 +119,7 @@ var ajax = function(opt, success, failure) {
   };
 
   req.send(data);
+  return req;
 };
 
 ajax.formify = formify;
