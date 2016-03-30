@@ -2,6 +2,18 @@ var UI = require('ui');
 var Vector2 = require('vector2');
 var ajax = require('ajax');
 var baseURL = 'http://zgulde.me/cardsapi/decks';
+var windowStack = [];
+
+function show (uiCard) {
+    windowStack.push(uiCard);
+    uiCard.show();
+}
+
+function exit () {
+    windowStack.forEach(function(window){
+        window.hide();
+    });
+}
 
 // makes a request to the base url with additional url parameters and data
 // returns the response parsed as JSON
@@ -50,4 +62,8 @@ var main = new UI.Card({
           'Player: ' + showHand(playerHand)
 });
 
-main.show();
+show(main);
+
+main.on('click', 'select', function(e){
+    exit();
+});
