@@ -2,10 +2,9 @@ var UI = require('ui');
 var Vector2 = require('vector2');
 var ajax = require('ajax');
 var baseURL = 'http://zgulde.me/cardsapi/decks';
-// keep track of all the windows we make
 var windowStack = [];
 
-// show a card and push it onto the windowStack
+// keep track of all the windows we make before we show them
 function show (uiCard) {
     windowStack.push(uiCard);
     uiCard.show();
@@ -51,31 +50,14 @@ function showHand (hand, hidden) {
     }).join(' ');
 }
 
-// grab the id of the newly created deck
-var deckid = request({method: 'post', data: {shuffle: true}}).id;
-// all our reqests should now go to that deck id
-baseURL += '/' + deckid;
-
-var dealerHand = draw(2);
-var playerHand = draw(2);
-
-var main = new UI.Card({
-    body: 'Dealer: ' + showHand(dealerHand, true) + '\n' + 
-          'Player: ' + showHand(playerHand)
-});
-
-show(main);
-
-main.on('click', 'select', function(e){
+function showMenu () {
     var menu = new UI.Menu({
         sections: [{
-            items: [{
-                title: 'Hit'
-            }, {
-                title: 'Stay'
-            }, {
-                title: 'Exit'
-            }]
+            items: [
+                {title:  'Hit'},
+                {title: 'Stay'},
+                {title: 'Exit'}
+            ]
         }]
     });
 
@@ -94,4 +76,25 @@ main.on('click', 'select', function(e){
     });
 
     show(menu);
-});
+}
+
+function showMain () {
+    var main = new UI.Card({
+        body: 'Dealer: ' + showHand(dealerHand, true) + '\n' + 
+              'Player: ' + showHand(playerHand)
+    });
+
+    main.on('click', 'select', showMenu);
+
+    show(main);
+}
+
+// grab the id of the newly created deck
+var deckid = request({method: 'post', data: {shuffle: true}}).id;
+// all our reqests should now go to that deck id
+baseURL += '/' + deckid;
+
+var dealerHand = draw(2);
+var playerHand = draw(2);
+
+showMain();
