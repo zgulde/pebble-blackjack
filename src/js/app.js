@@ -5,8 +5,14 @@ var baseURL = 'http://zgulde.me/cardsapi/decks';
 var windowStack = [];
 
 Object.defineProperty(Array.prototype, 'first', {
-    get: function(){
+    get: function () {
         return this[0];
+    }
+});
+
+Object.defineProperty(Array.prototype, 'rest', {
+    get: function () {
+        return this.slice(1, this.length);
     }
 });
 
@@ -16,6 +22,7 @@ function show (uiCard) {
     uiCard.show();
 }
 
+// get rid of all the windows -> exit the application
 function exit () {
     windowStack.forEach(function(window){
         window.hide();
@@ -57,9 +64,6 @@ function getValue (card) {
 
 function getHandTotal (hand) {
     return hand.reduce(function(total, card){
-        console.log('inside hand reduce cb');
-        console.log(total);
-        console.log(card);
         return total + getValue(card);
     }, 0);
 }
@@ -68,11 +72,11 @@ function showHand (hand, hidden) {
     hidden = (typeof hidden !== 'undefined') ? hidden : false;
 
     var handString = '';
-    var firstCard  = hand.shift();
+    var firstCard  = hand.first;
 
     handString += (hidden) ? '[???] ' : '[' + firstCard.string + '] ';
 
-    return handString + hand.map(function(card){
+    return handString + hand.rest.map(function(card){
         return '[' + card.string + ']';
     }).join(' ');
 }
@@ -80,40 +84,65 @@ function showHand (hand, hidden) {
 // dealer draws till he is at 17 with drawDealer(), check for win or loss, pass
 // as a parameter to end game
 function onStay() {
-    while (dealerHand < 16) {
-        dealerHand.push(draw().first)
+    var playerTotal = getHandTotal(playerHand);
+    var dealerTotal = getHandTotal(dealerHand);
+
+    while (getHandTotal(dealerHand) < 17) {
+        dealerHand.push(draw().first);
+        dealerTotal = getHandTotal(dealerHand);
     }
+
+    var hasPlayerWon = dealerTotal > 21 || playerTotal > dealerTotal;
+
+    endGame(hasPlayerWon);
 }
 
 // add a card to the player's hand, if they haven't busted, show the main
 // display again
 function onHit () {
-    playerHand(draw().first);
+    playerHand.push(draw().first);
+
     if (getHandTotal(playerHand) > 21) {
-        endGame();
+        hasPlayerWon = false;
+        endGame(hasPlayerWon);
     } else {
         showMain();
     }
 }
 
-function endGame () {
-    // display game over message and exit
+function endGame (hasPlayerWon) {
+    var msg = 'You ' + (hasPlayerWon ? 'Win!' : 'Lose!');
+
+    var main = new UI.Card({
+        scrollable: true,
+        subtitle: msg,
+        body: 'Dealer: ' + getHandTotal(dealerHand) + '\n' +
+              showHand(dealerHand) + '\n' +
+              'Player: ' + getHandTotal(playerHand) + '\n' +
+              showHand(playerHand)
+              
+    });
+
+    main.on('click', 'select', exit);
+    main.on('click', 'up',     exit);
+    main.on('click', 'down',   exit);
+
+    show(main);
 }
 
 function showMenu () {
     var menu = new UI.Menu({
         sections: [{
             items: [
-                {title:  'Hit'},
+                {title: 'Hit' },
                 {title: 'Stay'},
                 {title: 'Exit'}
             ]
         }]
     });
 
-    menu.on('select', function(e){
-        console.log(e.item.title);
-        switch(e.item.title){
+    menu.on('select', function(event){
+        switch(event.item.title){
             case 'Hit':
                 onHit();
                 break;
@@ -130,12 +159,14 @@ function showMenu () {
 
 function showMain () {
     var main = new UI.Card({
-        body: 'Dealer: ' + showHand(dealerHand, true) + '\n' + 
-              'Player: ' + showHand(playerHand) + '\n' +
-              getHandTotal(playerHand)
+        scrollable: true,
+        body:      'Dealer: ' + '\n' + showHand(dealerHand, true) + '\n' +
+                   'Player: ' + '\n' + showHand(playerHand)       + '\n'
     });
 
     main.on('click', 'select', showMenu);
+    main.on('click', 'up',     showMenu);
+    main.on('click', 'down',   showMenu);
 
     show(main);
 }
