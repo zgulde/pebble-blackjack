@@ -45,8 +45,25 @@ function draw (count) {
     return request({url: '/draw', data: {count: count}}).cards;
 }
 
-// returns a pretty representation of a player's hand. The second parameter,
-// hidden, defaults to false, if passed it will hide the first card.
+function getValue (card) {
+    if (2 <= card.value || card.value <= 10) {
+        return parseInt(card.value);
+    } else if (card.value == 'A') {
+        return 11;
+    } else {
+        return 10;
+    }
+}
+
+function getHandTotal (hand) {
+    return hand.reduce(function(total, card){
+        console.log('inside hand reduce cb');
+        console.log(total);
+        console.log(card);
+        return total + getValue(card);
+    }, 0);
+}
+
 function showHand (hand, hidden) {
     hidden = (typeof hidden !== 'undefined') ? hidden : false;
 
@@ -114,7 +131,8 @@ function showMenu () {
 function showMain () {
     var main = new UI.Card({
         body: 'Dealer: ' + showHand(dealerHand, true) + '\n' + 
-              'Player: ' + showHand(playerHand)
+              'Player: ' + showHand(playerHand) + '\n' +
+              getHandTotal(playerHand)
     });
 
     main.on('click', 'select', showMenu);
