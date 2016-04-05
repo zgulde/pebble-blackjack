@@ -4,6 +4,12 @@ var ajax = require('ajax');
 var baseURL = 'http://zgulde.me/cardsapi/decks';
 var windowStack = [];
 
+Object.defineProperty(Array.prototype, 'first', {
+    get: function(){
+        return this[0];
+    }
+});
+
 // keep track of all the windows we make before we show them
 function show (uiCard) {
     windowStack.push(uiCard);
@@ -32,6 +38,8 @@ function request (options) {
     }).responseText);
 }
 
+// optionally takes a count, the number of cards to draw, and returns an array
+// of the cards that were drawn (even if it is just one card)
 function draw (count) {
     count = (typeof count !== 'undefined') ? count : 1;
     return request({url: '/draw', data: {count: count}}).cards;
@@ -48,6 +56,25 @@ function showHand (hand, hidden) {
     return handString + hand.map(function(card){
         return '[' + card.string + ']';
     }).join(' ');
+}
+
+function onStay() {
+    while (dealerHand < 16) {
+        dealerHand.push(draw().first)
+    }
+}
+
+function onHit () {
+    playerHand(draw().first);
+    if (getHandTotal(playerHand) > 21) {
+        endGame();
+    } else {
+        showMain();
+    }
+}
+
+function endGame () {
+    // display game over message and exit
 }
 
 function showMenu () {
