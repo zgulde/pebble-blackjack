@@ -71,12 +71,12 @@ function getHandTotal (hand) {
 function showHand (hand, hidden) {
     hidden = (typeof hidden !== 'undefined') ? hidden : false;
 
-    var handString = '';
-    var firstCard  = hand.first;
+    var firstCardString = '';
+    var firstCard       = hand.first;
 
-    handString += (hidden) ? '[???] ' : '[' + firstCard.string + '] ';
+    firstCardString += (hidden) ? '[???] ' : '[' + firstCard.string + '] ';
 
-    return handString + hand.rest.map(function(card){
+    return firstCardString + hand.rest.map(function(card){
         return '[' + card.string + ']';
     }).join(' ');
 }
@@ -86,13 +86,14 @@ function showHand (hand, hidden) {
 function onStay() {
     var playerTotal = getHandTotal(playerHand);
     var dealerTotal = getHandTotal(dealerHand);
+    var hasPlayerWon;
 
-    while (getHandTotal(dealerHand) < 17) {
+    while (getHandTotal(dealerHand) < 16) {
         dealerHand.push(draw().first);
         dealerTotal = getHandTotal(dealerHand);
     }
 
-    var hasPlayerWon = dealerTotal > 21 || playerTotal > dealerTotal;
+    hasPlayerWon = dealerTotal > 21 || playerTotal > dealerTotal;
 
     endGame(hasPlayerWon);
 }
@@ -103,7 +104,7 @@ function onHit () {
     playerHand.push(draw().first);
 
     if (getHandTotal(playerHand) > 21) {
-        hasPlayerWon = false;
+        var hasPlayerWon = false;
         endGame(hasPlayerWon);
     } else {
         showMain();
@@ -111,15 +112,14 @@ function onHit () {
 }
 
 function endGame (hasPlayerWon) {
-    var msg = 'You ' + (hasPlayerWon ? 'Win!' : 'Lose!');
-
     var main = new UI.Card({
         scrollable: true,
-        subtitle: msg,
-        body: 'Dealer: ' + getHandTotal(dealerHand) + '\n' +
-              showHand(dealerHand) + '\n' +
-              'Player: ' + getHandTotal(playerHand) + '\n' +
-              showHand(playerHand)
+        subtitle:   'You ' + (hasPlayerWon ? 'Win!' : 'Lose!'),
+
+        body:       'Dealer: ' + getHandTotal(dealerHand) + '\n' +
+                    showHand(dealerHand) + '\n' +
+                    'Player: ' + getHandTotal(playerHand) + '\n' +
+                    showHand(playerHand)
               
     });
 
