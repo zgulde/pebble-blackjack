@@ -45,6 +45,8 @@ function draw (count) {
     return request({url: '/draw', data: {count: count}}).cards;
 }
 
+// returns a pretty representation of a player's hand. The second parameter,
+// hidden, defaults to false, if passed it will hide the first card.
 function showHand (hand, hidden) {
     hidden = (typeof hidden !== 'undefined') ? hidden : false;
 
@@ -58,12 +60,16 @@ function showHand (hand, hidden) {
     }).join(' ');
 }
 
+// dealer draws till he is at 17 with drawDealer(), check for win or loss, pass
+// as a parameter to end game
 function onStay() {
     while (dealerHand < 16) {
         dealerHand.push(draw().first)
     }
 }
 
+// add a card to the player's hand, if they haven't busted, show the main
+// display again
 function onHit () {
     playerHand(draw().first);
     if (getHandTotal(playerHand) > 21) {
